@@ -13,3 +13,4 @@ production
 
 server-compiled.js
 manifest.json
+src/client/__snapshots__
