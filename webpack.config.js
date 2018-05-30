@@ -1,45 +1,45 @@
+// webpack v4
 const path = require('path')
-const nodeExternals = require('webpack-node-externals')
-const HtmlWebPackPlugin = require('html-webpack-plugin')
+// const ExtractTextPlugin = require('extract-text-webpack-plugin')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const CleanWebpackPlugin = require('clean-webpack-plugin')
 
-const moduleObj = {
-    loaders: [
-        {
-            test: /\.js$/,
-            exclude: /node_modules/,
-            loaders: ["babel-loader"],
-        }
-    ],
-}
 
-const client = {
-  entry: {
-    'client': './src/client/index.js'
-  },
-  target: 'web',
+module.exports = {
+  entry: { main: './src/index.js' },
   output: {
-    filename: '[name].js',
-    path: path.resolve(__dirname, 'dist/public')
+    path: path.resolve(__dirname, 'dist'),
+    filename: '[name].[chunkhash].js'
   },
-  module: moduleObj,
-  plugins: [
-    new HtmlWebPackPlugin({
-      template: 'src/client/index.html'
+  module: {
+    rules: [
+      {
+        test: /\.(js|jsx)$/,
+        exclude: /node_modules/,
+        use: {
+          loader: 'babel-loader'
+        }
+      },
+      {
+        test: /\.scss$/,
+        use:  [  'style-loader', MiniCssExtractPlugin.loader, 'css-loader', 'postcss-loader', 'sass-loader']
+      }
+    ]
+  },
+  plugins: [ 
+    new CleanWebpackPlugin('dist', {} ),
+    // new ExtractTextPlugin(
+    //   {filename: 'style.[hash].css', disable: false, allChunks: true }
+    // ),
+    new MiniCssExtractPlugin({
+      filename: 'style.[contenthash].css',
+    }),
+    new HtmlWebpackPlugin({
+      inject: false,
+      hash: true,
+      template: './src/index.html',
+      filename: 'index.html'
     })
   ]
 }
-
-const server = {
-    entry: {
-        'server': './src/server/index.js'
-    },
-    target: 'node',
-    output: {
-        filename: '[name].js',
-        path: path.resolve(__dirname, 'dist')
-    },
-    module: moduleObj,
-    externals: [nodeExternals()]
-}
-
-module.exports = [client, server]
