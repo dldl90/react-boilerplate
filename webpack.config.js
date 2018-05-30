@@ -1,5 +1,6 @@
 // webpack v4
 const path = require('path')
+const webpack = require('webpack')
 // const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
@@ -10,16 +11,14 @@ module.exports = {
   entry: { main: './src/index.js' },
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: '[name].[chunkhash].js'
+    filename: '[name].[hash].js'
   },
   module: {
     rules: [
       {
         test: /\.(js|jsx)$/,
         exclude: /node_modules/,
-        use: {
-          loader: 'babel-loader'
-        }
+        use: ['babel-loader']
       },
       {
         test: /\.scss$/,
@@ -27,13 +26,17 @@ module.exports = {
       }
     ]
   },
-  plugins: [ 
+  resolve: {
+    extensions: ['*', '.js', '.jsx']
+  },
+  plugins: [
     new CleanWebpackPlugin('dist', {} ),
     // new ExtractTextPlugin(
     //   {filename: 'style.[hash].css', disable: false, allChunks: true }
     // ),
+    new webpack.HotModuleReplacementPlugin(),
     new MiniCssExtractPlugin({
-      filename: 'style.[contenthash].css',
+      filename: 'style.[hash].css',
     }),
     new HtmlWebpackPlugin({
       inject: false,
@@ -41,5 +44,9 @@ module.exports = {
       template: './src/index.html',
       filename: 'index.html'
     })
-  ]
+  ],
+  devServer: {
+    contentBase: './dist',
+    hot: true
+  }
 }

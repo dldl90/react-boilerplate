@@ -7,3 +7,5 @@ import App from './app'
 import './scss/style.scss'
 
 ReactDOM.render(<App />, document.getElementById('app'))
+
+module.hot.accept()
